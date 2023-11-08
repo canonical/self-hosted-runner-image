@@ -1,0 +1,19 @@
+name: Build image
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  build-image:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run build script
+        run: bash build-image.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: self-hosted-runner-image 
+          path: ./runner-image.tar.gz
+          if-no-files-found: error
