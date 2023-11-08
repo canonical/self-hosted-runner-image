@@ -9,7 +9,7 @@ jobs:
   build-image:
     runs-on: ubuntu-22.04
     steps:
-      - uses: canonical/setup-lxd
+      - uses: canonical/setup-lxd@main
       - uses: actions/checkout@v4
       - name: Run build script
         run: bash build-image.sh
