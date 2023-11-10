@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+/snap/bin/lxc exec runner -- /usr/bin/snap install aproxy --edge
+/snap/bin/lxc exec runner -- /usr/bin/snap set aproxy proxy=squid.internal:3128
+/snap/bin/lxc exec runner -- /usr/sbin/nft -f - << EOF
+define default-ip = $(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
+define private-ips = { 10.0.0.0/8, 127.0.0.1/8, 172.16.0.0/12, 192.168.0.0/16 }
+table ip aproxy
+flush table ip aproxy
+table ip aproxy {
+      chain prerouting {
+              type nat hook prerouting priority dstnat; policy accept;
+              ip daddr != \$private-ips tcp dport { 80, 443 } counter dnat to \$default-ip:8443
+      }
+
+      chain output {
+              type nat hook output priority -100; policy accept;
+              ip daddr != \$private-ips tcp dport { 80, 443 } counter dnat to \$default-ip:8443
+      }
+}
+EOF
+
 /snap/bin/lxc launch ubuntu-daily:jammy runner --vm
 while ! /snap/bin/lxc exec runner -- echo "Ready to run commands"
 do
