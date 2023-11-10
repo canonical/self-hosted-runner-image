@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+/snap/bin/lxc launch ubuntu-daily:jammy runner --vm
+while ! /snap/bin/lxc exec runner -- echo "Ready to run commands"
+do
+    sleep 10
+done
+
 /snap/bin/lxc exec runner -- /usr/bin/snap install aproxy --edge
 /snap/bin/lxc exec runner -- /usr/bin/snap set aproxy proxy=squid.internal:3128
 /snap/bin/lxc exec runner -- /usr/sbin/nft -f - << EOF
@@ -19,12 +25,6 @@ table ip aproxy {
       }
 }
 EOF
-
-/snap/bin/lxc launch ubuntu-daily:jammy runner --vm
-while ! /snap/bin/lxc exec runner -- echo "Ready to run commands"
-do
-    sleep 10
-done
 
 /snap/bin/lxc exec runner -- /usr/bin/apt-get update
 /snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- /usr/bin/apt-get upgrade -yq
