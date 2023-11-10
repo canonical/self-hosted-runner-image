@@ -6,7 +6,7 @@ do
     sleep 10
 done
 
-sleep 120
+sleep 60
 
 /snap/bin/lxc exec runner -- /usr/bin/apt-get update
 /snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- /usr/bin/apt-get upgrade -yq
