@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
 /snap/bin/lxc launch ubuntu-daily:jammy runner --vm
-while ! /snap/bin/lxc exec runner -- echo "Ready to run commands"
+while ! /snap/bin/lxc exec runner -- /usr/bin/who
 do
+    echo "Wait for lxd agent to be ready"
+    sleep 10
+done
+while ! /snap/bin/lxc exec runner -- /usr/bin/nslookup github.com
+do
+    echo "Wait for network to be ready"
     sleep 10
 done
 
-sleep 60
-
-/snap/bin/lxc exec runner -- sh -c "/usr/bin/apt-get update"
-/snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- sh -c "/usr/bin/apt-get upgrade -yq"
-/snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- sh -c "/usr/bin/apt-get install linux-generic-hwe-22.04 -yq"
+/snap/bin/lxc exec runner -- /usr/bin/apt-get update
+/snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- /usr/bin/apt-get upgrade -yq
+/snap/bin/lxc exec runner --env DEBIAN_FRONTEND=noninteractive -- /usr/bin/apt-get install linux-generic-hwe-22.04 -yq
 
 /snap/bin/lxc restart runner
-while ! /snap/bin/lxc exec runner -- echo "Ready to run commands"
+while ! /snap/bin/lxc exec runner -- /usr/bin/who
 do
+    echo "Wait for lxd agent to be ready"
+    sleep 10
+done
+while ! /snap/bin/lxc exec runner -- /usr/bin/nslookup github.com
+do
+    echo "Wait for network to be ready"
     sleep 10
 done
 
