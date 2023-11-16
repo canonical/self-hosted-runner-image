@@ -10,6 +10,8 @@ jobs:
     runs-on: [self-hosted, large]
     steps:
       - uses: canonical/setup-lxd@main
+        with:
+          channel: 5.19/stable
       - uses: actions/checkout@v4
       - name: Run build script
         run: bash build-image.sh
